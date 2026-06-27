@@ -1,5 +1,9 @@
 import { FC } from 'react';
+
+import { useDominoTheme } from './DominoThemeContext';
 import { DominoHalf } from './DominoHalf';
+import type { DominoTheme, TileRenderContext } from './dominoTheme';
+import { themeDataAttributes } from './dominoTheme';
 import { PipColorMap } from './pipColors';
 
 export interface DoubleTwelveProps {
@@ -16,6 +20,8 @@ export interface DoubleTwelveProps {
   pipColors?: PipColorMap;
   borderColor?: string;
   rotation?: number;
+  /** Presentation overrides — also available via DominoThemeProvider. */
+  theme?: DominoTheme;
 }
 
 export const DoubleTwelve: FC<DoubleTwelveProps> = ({
@@ -28,13 +34,29 @@ export const DoubleTwelve: FC<DoubleTwelveProps> = ({
   pipColors,
   borderColor = 'black',
   rotation = 0,
+  theme: themeOverride,
 }) => {
-  // Validate input values
+  const theme = useDominoTheme(themeOverride);
   const val1 = Math.min(Math.max(value1, 0), 12);
   const val2 = Math.min(Math.max(value2, 0), 12);
 
+  const tileCtx: TileRenderContext = {
+    value1: val1,
+    value2: val2,
+    width,
+    height,
+    backgroundColor,
+    borderColor,
+    rotation,
+  };
+
+  const tileThemed = theme.tileStyle?.(tileCtx) ?? {};
+  const dividerThemed = theme.halfDividerStyle?.(tileCtx) ?? {};
+
   return (
     <div
+      className={theme.tileClassName}
+      {...themeDataAttributes(theme.tileDataAttributes)}
       style={{
         width: `${width}px`,
         height: `${height}px`,
@@ -49,6 +71,7 @@ export const DoubleTwelve: FC<DoubleTwelveProps> = ({
         display: 'flex',
         flexDirection: 'column',
         overflow: 'hidden',
+        ...tileThemed,
       }}
     >
       <div
@@ -58,6 +81,7 @@ export const DoubleTwelve: FC<DoubleTwelveProps> = ({
           borderBottomWidth: '1px',
           borderBottomStyle: 'solid',
           borderBottomColor: borderColor,
+          ...dividerThemed,
         }}
       >
         <DominoHalf value={val1} pipColor={pipColor} pipColors={pipColors} />

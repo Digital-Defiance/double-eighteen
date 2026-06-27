@@ -4,6 +4,19 @@ export type { DoubleTwelveProps } from './app/DoubleTwelve';
 export { MexicanTrainGame } from './app/MexicanTrainGame';
 export { DominoHub, hubTrainStartDistance } from './app/DominoHub';
 export { DominoTrain } from './app/DominoTrain';
+export { DominoThemeProvider, useDominoTheme } from './app/DominoThemeContext';
+export type { DominoThemeProviderProps } from './app/DominoThemeContext';
+export { DefaultPip } from './app/DefaultPip';
+export {
+  DEFAULT_DOMINO_THEME,
+  mergeDominoTheme,
+  themeDataAttributes,
+} from './app/dominoTheme';
+export type {
+  DominoTheme,
+  PipRenderContext,
+  TileRenderContext,
+} from './app/dominoTheme';
 
 // Pip color API
 export {
