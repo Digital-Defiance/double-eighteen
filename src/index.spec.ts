@@ -75,6 +75,24 @@ describe('public API surface', () => {
       'getLegalMoves',
       'applyMove',
       'playMove',
+      // AI policy core
+      'isPlayAction',
+      'getAccessibleTrainIndices',
+      'collectAllPlayedKeys',
+      'generatePlayActions',
+      'createCandidateGenerator',
+      'defaultCandidateGenerator',
+      'HEURISTIC_IDS',
+      'DEFAULT_HEURISTICS',
+      'SKILL_PRESETS',
+      'getSkillProfile',
+      'createAiPlayer',
+      'scoreWithHeuristics',
+      'argmaxIndex',
+      'softmaxIndex',
+      'chooseActionIndex',
+      'createPolicyPlayer',
+      'searchActionValues',
     ] as const;
 
     for (const name of expected) {
