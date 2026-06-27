@@ -1,4 +1,5 @@
 import { render } from '@testing-library/react';
+import { afterEach, vi } from 'vitest';
 import { DominoTrain } from './DominoTrain';
 import { TrainData } from '@/game/TrainData';
 
@@ -70,5 +71,40 @@ describe('DominoTrain', () => {
     });
     const root = container.querySelector<HTMLElement>(TILE);
     expect(root?.style.borderColor).toBe('red');
+  });
+
+  describe('rule enforcement (dev guard)', () => {
+    afterEach(() => {
+      vi.restoreAllMocks();
+    });
+
+    it('warns when a train chain does not connect by value', () => {
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+      renderTrain({
+        playerId: 4,
+        isPublic: false,
+        // 6 does not connect to 9 → an illegal sequence.
+        dominoes: [
+          { value1: 12, value2: 6 },
+          { value1: 9, value2: 3 },
+        ],
+      });
+      expect(warn).toHaveBeenCalled();
+      expect(String(warn.mock.calls[0])).toMatch(/does not follow the rules|does not connect/i);
+    });
+
+    it('does not warn for a valid chain', () => {
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+      renderTrain({
+        playerId: 5,
+        isPublic: false,
+        dominoes: [
+          { value1: 12, value2: 6 },
+          { value1: 6, value2: 6 },
+          { value1: 6, value2: 3 },
+        ],
+      });
+      expect(warn).not.toHaveBeenCalled();
+    });
   });
 });

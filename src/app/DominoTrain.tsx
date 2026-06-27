@@ -1,4 +1,4 @@
-import { FC, useMemo } from 'react';
+import { FC, useEffect, useMemo } from 'react';
 import { DoubleTwelve } from '@/app/DoubleTwelve';
 import {
   DOMINO_HEIGHT,
@@ -6,8 +6,18 @@ import {
   computeTrainTree,
   flattenSegments,
 } from '@/app/trainLayout';
+import { validateChickenFootChain } from '@/harness/layoutValidation';
 import { TrainData } from '@/game/TrainData';
 import { PipColorMap } from '@/app/pipColors';
+
+/** True in dev/test, false in the production library bundle (Vite inlines it). */
+const IS_DEV = (() => {
+  try {
+    return Boolean(import.meta.env?.DEV);
+  } catch {
+    return false;
+  }
+})();
 
 interface DominoTrainProps {
   startX: number;
@@ -34,6 +44,24 @@ export const DominoTrain: FC<DominoTrainProps> = ({
   centerY,
   pipColors,
 }) => {
+  // Guard rail: a train must be a sequentially-correct chain (like-values
+  // touching, toes connecting to their double). Rather than silently drawing a
+  // broken train, surface the rule violations in dev. Never throws, so it can't
+  // crash a host app's render in production.
+  useEffect(() => {
+    if (!IS_DEV) return;
+    const result = validateChickenFootChain({
+      dominoes: trainData.dominoes,
+      feet: trainData.feet,
+    });
+    if (!result.valid) {
+      console.warn(
+        `DominoTrain: player ${trainData.playerId} train does not follow the rules:`,
+        result.issues.map((issue) => issue.message)
+      );
+    }
+  }, [trainData.dominoes, trainData.feet, trainData.playerId]);
+
   const trainLayout = useMemo(
     () =>
       flattenSegments(

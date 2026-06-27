@@ -1,5 +1,5 @@
 import { DominoValue } from '@/game/DominoValue';
-import { TrainBranch } from '@/game/TrainData';
+import { TrainBend, TrainBranch } from '@/game/TrainData';
 
 export const DOMINO_WIDTH = 60;
 export const DOMINO_HEIGHT = 120;
@@ -50,6 +50,12 @@ export interface ComputeTrainLayoutInput {
    * toes sit at equal, close distances on either side.
    */
   hubIndex?: number;
+  /**
+   * Pivots that fold this run's path into Ls, Us, or snakes. When present, the
+   * run is split into straight sub-runs at each bend index and chained corner to
+   * corner. Hub-centering is skipped (corners relax centering by design).
+   */
+  bends?: readonly TrainBend[];
 }
 
 export function halfExtentAlongTrain(
@@ -85,29 +91,23 @@ export function trainPerpendicular(angle: number): { perpX: number; perpY: numbe
   return { perpX: -dirY, perpY: dirX };
 }
 
-export function orientDominoValues(
-  dominoes: DominoValue[],
-  layoutStyle: TrainLayoutStyle
-): DominoValue[] {
+/**
+ * Orients a value chain for rendering so each tile's connecting value (`value1`,
+ * the near end) faces the previous tile. A tile is flipped only when it is
+ * stored reversed (its `value2`, not `value1`, is the one that matches the
+ * previous tile's open end). A correctly-stored chain is left untouched, and
+ * doubles are never flipped. This is identical for linear and offset layouts —
+ * the connection rule doesn't depend on spacing.
+ */
+export function orientDominoValues(dominoes: DominoValue[]): DominoValue[] {
   const oriented = dominoes.map((domino) => ({ ...domino }));
 
   for (let i = 1; i < oriented.length; i++) {
     const domino = oriented[i];
-    const prevDomino = oriented[i - 1];
-    const prevValue = prevDomino.value2;
+    const prevValue = oriented[i - 1].value2;
     const isDouble = domino.value1 === domino.value2;
 
-    if (layoutStyle === 'linear' && !isDouble) {
-      oriented[i] = { value1: domino.value2, value2: domino.value1 };
-      continue;
-    }
-
-    if (
-      layoutStyle === 'offset' &&
-      !isDouble &&
-      domino.value1 !== prevValue &&
-      domino.value2 === prevValue
-    ) {
+    if (!isDouble && domino.value1 !== prevValue && domino.value2 === prevValue) {
       oriented[i] = { value1: domino.value2, value2: domino.value1 };
     }
   }
@@ -133,23 +133,41 @@ export function nextPerpOffset(current: number, outwardSign: number): number {
   return current === outwardSign ? -outwardSign : outwardSign;
 }
 
-export function computeTrainLayout({
+interface PlaceOrientedRunInput {
+  orientedDominoes: readonly DominoValue[];
+  startX: number;
+  startY: number;
+  angle: number;
+  layoutStyle: TrainLayoutStyle;
+  dominoWidth: number;
+  dominoHeight: number;
+  leadGap: number;
+  outwardSign: number;
+  hubIndex?: number;
+}
+
+/**
+ * Places an already value-oriented run of dominoes along a single straight
+ * heading. This is the geometric core shared by straight runs and by each
+ * sub-run of a bent (folded) path; it never re-orients tiles, so callers that
+ * split a run at bends can orient the whole value-chain once and still keep
+ * like-values touching across every corner.
+ */
+function placeOrientedRun({
+  orientedDominoes,
   startX,
   startY,
   angle,
-  dominoes,
   layoutStyle,
-  dominoWidth = DOMINO_WIDTH,
-  dominoHeight = DOMINO_HEIGHT,
-  leadGap = dominoHeight * 0.3,
-  outwardSign: outwardSignInput,
+  dominoWidth,
+  dominoHeight,
+  leadGap,
+  outwardSign,
   hubIndex,
-}: ComputeTrainLayoutInput): TrainLayoutEntry[] {
+}: PlaceOrientedRunInput): TrainLayoutEntry[] {
   const layout: TrainLayoutEntry[] = [];
   const { dirX, dirY } = trainDirection(angle);
   const { perpX, perpY } = trainPerpendicular(angle);
-  const orientedDominoes = orientDominoValues([...dominoes], layoutStyle);
-  const outwardSign = outwardSignInput ?? outwardPerpSign(angle);
   const isHub = layoutStyle === 'offset' && hubIndex != null;
   // Lane (perpStep units) of each placed tile, used to recenter the inbound run
   // onto the hub double afterward.
@@ -257,6 +275,197 @@ export function computeTrainLayout({
   return layout;
 }
 
+/**
+ * Normalizes a run's bends: integer indices strictly inside the run, one per
+ * index (last wins), sorted. Index 0 is dropped — a run can't bend before its
+ * first tile. Returns the cleaned, sorted list.
+ */
+export function normalizeBends(
+  bends: readonly TrainBend[] | undefined,
+  tileCount: number
+): TrainBend[] {
+  if (!bends || bends.length === 0) return [];
+  const byIndex = new Map<number, number>();
+  for (const bend of bends) {
+    if (!Number.isInteger(bend.index)) continue;
+    if (bend.index <= 0 || bend.index >= tileCount) continue;
+    byIndex.set(bend.index, bend.turn);
+  }
+  return [...byIndex.entries()]
+    .map(([index, turn]) => ({ index, turn }))
+    .sort((a, b) => a.index - b.index);
+}
+
+/**
+ * Local heading (degrees) of the tile at `index` in a (possibly bent) run: the
+ * base `angle` plus every bend turn at or before that index. With no bends this
+ * is just `angle`. Used to anchor chicken-foot toes off a double's *actual*
+ * heading when the double sits in a turned section of the path.
+ */
+export function headingAtIndex(
+  angle: number,
+  bends: readonly TrainBend[] | undefined,
+  index: number,
+  tileCount = Infinity
+): number {
+  const cleaned = normalizeBends(bends, Number.isFinite(tileCount) ? tileCount : index + 1);
+  let heading = angle;
+  for (const bend of cleaned) {
+    if (bend.index <= index) heading += bend.turn;
+    else break;
+  }
+  return heading;
+}
+
+/**
+ * Lays out a run that folds at one or more bends. The whole value-chain is
+ * oriented once (so like-values keep touching), then split into straight
+ * sub-runs at each bend index. Each post-bend sub-run is anchored at the open
+ * end of the previous sub-run's last tile and turned by the bend's angle.
+ *
+ * Corner handling: a perpendicular tile butted straight onto the prior tile's
+ * end would overlap it by a quarter-tile, so each post-bend sub-run is nudged
+ * half a tile-width along the *previous* heading. That converts the would-be
+ * overlap into a clean edge/point touch at the corner while the connecting pips
+ * still meet. Centering relaxes at corners (tiles bunch) — by design.
+ */
+function placeBentRun(
+  orientedDominoes: readonly DominoValue[],
+  input: Required<
+    Pick<
+      ComputeTrainLayoutInput,
+      'startX' | 'startY' | 'angle' | 'layoutStyle' | 'dominoWidth' | 'dominoHeight' | 'leadGap' | 'outwardSign'
+    >
+  >,
+  bends: readonly TrainBend[],
+  hubIndex?: number
+): TrainLayoutEntry[] {
+  const { startX, startY, angle, layoutStyle, dominoWidth, dominoHeight, leadGap, outwardSign } = input;
+  const boundaries = [0, ...bends.map((b) => b.index), orientedDominoes.length];
+
+  const result: TrainLayoutEntry[] = [];
+  let heading = angle;
+  let subStartX = startX;
+  let subStartY = startY;
+  let subLeadGap = leadGap;
+
+  for (let s = 0; s < boundaries.length - 1; s++) {
+    const slice = orientedDominoes.slice(boundaries[s], boundaries[s + 1]);
+    if (slice.length === 0) continue;
+
+    // Keep the hub double centered as long as it lives in the first (pre-bend)
+    // sub-run: this preserves the straight-run vertical position so a bend
+    // elsewhere doesn't shift the whole train and spuriously collide. Later
+    // sub-runs chain off this centered run, so they follow along.
+    const subHubIndex =
+      s === 0 && hubIndex != null && hubIndex < boundaries[1] ? hubIndex : undefined;
+
+    const sub = placeOrientedRun({
+      orientedDominoes: slice,
+      startX: subStartX,
+      startY: subStartY,
+      angle: heading,
+      layoutStyle,
+      dominoWidth,
+      dominoHeight,
+      leadGap: subLeadGap,
+      outwardSign,
+      hubIndex: subHubIndex,
+    });
+    result.push(...sub);
+
+    const isLastSub = s >= boundaries.length - 2;
+    if (isLastSub) break;
+
+    // Chain the next sub-run off this one's open end, turned by the bend angle.
+    const last = sub[sub.length - 1];
+    const prevDir = trainDirection(heading);
+    const halfPrev = halfExtentAlongTrain(last.isDouble, dominoWidth, dominoHeight);
+
+    heading += bends[s].turn;
+    const nextFirst = orientedDominoes[boundaries[s + 1]];
+    const nextIsDouble = nextFirst.value1 === nextFirst.value2;
+    const halfNext = halfExtentAlongTrain(nextIsDouble, dominoWidth, dominoHeight);
+    const nextDir = trainDirection(heading);
+    const nextPerp = trainPerpendicular(heading);
+    const perpStep = dominoWidth / 2;
+
+    // Land the next sub-run's first tile so its connecting half sits edge-flush
+    // against the previous tile's open half — a clean L corner where the matching
+    // pips fully touch. Pull a half-width back along the previous heading (into
+    // the corner) and advance an extra half-width along the new heading so the
+    // turning tile clears the previous tile's body instead of overlapping it.
+    const targetX =
+      last.x + prevDir.dirX * (halfPrev - perpStep) + nextDir.dirX * (halfNext + perpStep);
+    const targetY =
+      last.y + prevDir.dirY * (halfPrev - perpStep) + nextDir.dirY * (halfNext + perpStep);
+
+    // In offset mode placeOrientedRun seeds a regular first tile a half-width
+    // into its outward lane; pre-cancel that so the tile lands exactly on the
+    // target. Linear runs and doubles get no perpendicular seed.
+    const seeds = layoutStyle === 'offset' && !nextIsDouble;
+    const seedX = seeds ? nextPerp.perpX * perpStep * outwardSign : 0;
+    const seedY = seeds ? nextPerp.perpY * perpStep * outwardSign : 0;
+
+    subStartX = targetX - seedX;
+    subStartY = targetY - seedY;
+    subLeadGap = 0;
+  }
+
+  return result;
+}
+
+export function computeTrainLayout({
+  startX,
+  startY,
+  angle,
+  dominoes,
+  layoutStyle,
+  dominoWidth = DOMINO_WIDTH,
+  dominoHeight = DOMINO_HEIGHT,
+  leadGap = dominoHeight * 0.3,
+  outwardSign: outwardSignInput,
+  hubIndex,
+  bends,
+}: ComputeTrainLayoutInput): TrainLayoutEntry[] {
+  const orientedDominoes = orientDominoValues([...dominoes]);
+  const outwardSign = outwardSignInput ?? outwardPerpSign(angle);
+
+  const cleanedBends = normalizeBends(bends, orientedDominoes.length);
+  if (cleanedBends.length > 0) {
+    // Hub-centering still applies to the pre-bend sub-run (so a bend doesn't
+    // shift the whole train); corners past it relax centering by design.
+    return placeBentRun(
+      orientedDominoes,
+      {
+        startX,
+        startY,
+        angle,
+        layoutStyle,
+        dominoWidth,
+        dominoHeight,
+        leadGap,
+        outwardSign,
+      },
+      cleanedBends,
+      hubIndex
+    );
+  }
+
+  return placeOrientedRun({
+    orientedDominoes,
+    startX,
+    startY,
+    angle,
+    layoutStyle,
+    dominoWidth,
+    dominoHeight,
+    leadGap,
+    outwardSign,
+    hubIndex,
+  });
+}
+
 /** The four world-space corners of a tile (its rotated rectangle). */
 export function tileCorners(
   entry: TrainLayoutEntry,
@@ -341,6 +550,46 @@ function overlapsAny(
   return others.some((other) =>
     tilesOverlap(tile, other, 1, dominoWidth, dominoHeight)
   );
+}
+
+/**
+ * True when any tile of `layout` overlaps any tile in `obstacles` — i.e. this
+ * path would physically intersect another path. Used to forbid a bend that
+ * would cross another train.
+ */
+export function layoutsCollide(
+  layout: readonly TrainLayoutEntry[],
+  obstacles: readonly TrainLayoutEntry[],
+  epsilon = 1,
+  dominoWidth = DOMINO_WIDTH,
+  dominoHeight = DOMINO_HEIGHT
+): boolean {
+  return layout.some((tile) =>
+    obstacles.some((other) =>
+      tilesOverlap(tile, other, epsilon, dominoWidth, dominoHeight)
+    )
+  );
+}
+
+/**
+ * True when a path crosses itself — any two of its own tiles overlap. Adjacent
+ * tiles that merely touch are fine (tilesOverlap ignores contact), so this only
+ * fires when a fold (e.g. a too-tight U-turn) makes the path collide with itself.
+ */
+export function layoutSelfIntersects(
+  layout: readonly TrainLayoutEntry[],
+  epsilon = 1,
+  dominoWidth = DOMINO_WIDTH,
+  dominoHeight = DOMINO_HEIGHT
+): boolean {
+  for (let i = 0; i < layout.length; i++) {
+    for (let j = i + 1; j < layout.length; j++) {
+      if (tilesOverlap(layout[i], layout[j], epsilon, dominoWidth, dominoHeight)) {
+        return true;
+      }
+    }
+  }
+  return false;
 }
 
 /**
@@ -441,6 +690,7 @@ export function computeTrainTree({
       leadGap,
       outwardSign: segmentOutward,
       hubIndex,
+      bends: branch.bends,
     });
 
   // Nudge this run outward (only toes get a pushAxis) until none of its tiles
@@ -493,8 +743,6 @@ export function computeTrainTree({
   ];
 
   if (branch.feet) {
-    const { dirX, dirY } = trainDirection(angle);
-    const { perpX, perpY } = trainPerpendicular(angle);
     const perpStep = dominoWidth / 2;
     const leadGap = dominoHeight / 2;
 
@@ -506,11 +754,22 @@ export function computeTrainTree({
         continue;
       }
 
+      // Anchor toes off the double's LOCAL heading so a double inside a bent
+      // section fans its toes relative to the turned path, not the base angle.
+      const hostAngle = headingAtIndex(
+        angle,
+        branch.bends,
+        hostIndex,
+        branch.dominoes.length
+      );
+      const { dirX, dirY } = trainDirection(hostAngle);
+      const { perpX, perpY } = trainPerpendicular(hostAngle);
+
       for (let toeIndex = 0; toeIndex < toes.length; toeIndex++) {
         const toe = toes[toeIndex];
         const toeOffset = CHICKEN_FOOT_TOE_ANGLES[toeIndex] ?? 0;
         const sideSign = Math.sign(toeOffset);
-        const toeAngle = angle + toeOffset;
+        const toeAngle = hostAngle + toeOffset;
         const toePerp = trainPerpendicular(toeAngle);
         // Seed the zigzag on the toe's INNER lane so each toe splays outward
         // (away from the center toe) as it extends rather than curling in.
