@@ -5,12 +5,14 @@ import HarnessIndex from './harness/HarnessIndex';
 import DominoHarness from './harness/DominoHarness';
 import TrainHarness from './harness/TrainHarness';
 import ChickenFootHarness from './harness/ChickenFootHarness';
+import BendHarness from './harness/BendHarness';
 
 const HARNESS_REDIRECTS: Record<string, string> = {
   pips: '/harness/pips',
   dominoes: '/harness/dominoes',
   trains: '/harness/trains',
   'chicken-foot': '/harness/chicken-foot',
+  bends: '/harness/bends',
 };
 
 function HarnessRedirect() {
@@ -33,6 +35,7 @@ export function App() {
       <Route path="/harness/dominoes" element={<DominoHarness />} />
       <Route path="/harness/trains" element={<TrainHarness />} />
       <Route path="/harness/chicken-foot" element={<ChickenFootHarness />} />
+      <Route path="/harness/bends" element={<BendHarness />} />
     </Routes>
   );
 }

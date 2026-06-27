@@ -17,6 +17,23 @@ interface DominoHubProps {
   pipColors?: PipColorMap;
 }
 
+/**
+ * Distance from the hub center at which a train should start so its first tile
+ * clears its neighbours. Trains fan out 360/slots° apart, so the neighbour gap
+ * at distance d is ~2πd/slots; it must exceed a tile's footprint. Offset trains
+ * zigzag wider (a perpendicular half-tile seed) and need a bigger ring; linear
+ * trains are skinny and stay near the hub. Never smaller than `radius + 20`.
+ */
+export function hubTrainStartDistance(
+  slots: number,
+  radius: number,
+  dominoWidth: number,
+  layoutStyle: 'offset' | 'linear'
+): number {
+  const minNeighborGap = dominoWidth * (layoutStyle === 'offset' ? 2.5 : 1.3);
+  return Math.max(radius + 20, Math.ceil((minNeighborGap * slots) / (2 * Math.PI)));
+}
+
 export const DominoHub: FC<DominoHubProps> = ({
   playerCount,
   centerX,
@@ -34,6 +51,8 @@ export const DominoHub: FC<DominoHubProps> = ({
   const hubSize = 120; // Increased to fit the standard domino size
   const dominoWidth = 60;
   const dominoHeight = 120; // Standard domino size to match the rest of the dominoes
+
+  const startDistance = hubTrainStartDistance(slots, radius, dominoWidth, layoutStyle);
 
   return (
     <div style={{ position: 'relative', width: '100%', height: '100%' }}>
@@ -78,8 +97,8 @@ export const DominoHub: FC<DominoHubProps> = ({
         const radians = (angle * Math.PI) / 180;
 
         // Calculate starting point for the train
-        const startX = centerX + (radius + 20) * Math.cos(radians);
-        const startY = centerY + (radius + 20) * Math.sin(radians);
+        const startX = centerX + startDistance * Math.cos(radians);
+        const startY = centerY + startDistance * Math.sin(radians);
 
         // Get train data for this position (if exists)
         const trainData = trains.find((t) => t.playerId === index) || {

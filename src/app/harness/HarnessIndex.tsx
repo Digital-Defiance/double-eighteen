@@ -23,6 +23,11 @@ const HARNESS_LINKS = [
     title: 'Chicken foot',
     description: 'Doubles fan three angled toes; recursive nested feet with spacing validation.',
   },
+  {
+    to: '/harness/bends',
+    title: 'Bend / pivot',
+    description: 'Click tiles to fold a train into Ls, Us, and snakes. Collision-guarded, with a pan/zoom viewport.',
+  },
 ];
 
 export const HarnessIndex: FC = () => {
