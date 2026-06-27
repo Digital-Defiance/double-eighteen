@@ -1,5 +1,9 @@
 import { FC } from 'react';
-import { Pip } from './Pip';
+
+import { DefaultPip } from './DefaultPip';
+import { useDominoTheme } from './DominoThemeContext';
+import type { PipRenderContext } from './dominoTheme';
+import { resolvePipPosition } from './pipGrid';
 import { getPipLayout } from './pipLayouts';
 import { PipColorMap, resolvePipStyle } from './pipColors';
 
@@ -26,23 +30,31 @@ export const PipPattern: FC<PipPatternProps> = ({
   pipColor,
   pipColors,
 }) => {
+  const theme = useDominoTheme();
   const { color, hollow } = pipProps(value, pipColor, pipColors);
   const layout = getPipLayout(value);
 
   return (
     <>
-      {layout.map((cell, index) => (
-        <Pip
-          key={index}
-          row={cell.row}
-          col={cell.col}
-          gridSize={cell.gridSize}
-          color={color}
-          hollow={hollow}
-          top={cell.top}
-          left={cell.left}
-        />
-      ))}
+      {layout.map((cell, index) => {
+        const ctx: PipRenderContext = {
+          value,
+          row: cell.row,
+          col: cell.col,
+          gridSize: cell.gridSize,
+          color,
+          hollow,
+          top: cell.top,
+          left: cell.left,
+          positionStyle: resolvePipPosition(cell),
+        };
+
+        if (theme.renderPip) {
+          return <span key={index}>{theme.renderPip(ctx)}</span>;
+        }
+
+        return <DefaultPip key={index} ctx={ctx} theme={theme} />;
+      })}
     </>
   );
 };
