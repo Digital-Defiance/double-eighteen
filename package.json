@@ -111,5 +111,8 @@
     "vite-plugin-dts": "^4.5.4",
     "vitest": "^3"
   },
-  "packageManager": "yarn@4.17.0"
+  "packageManager": "yarn@4.17.0",
+  "nx": {
+    "includedScripts": []
+  }
 }
