@@ -49,6 +49,10 @@ export { TRAIN_FIXTURES, CHICKEN_FOOT_FIXTURES } from './harness/trainFixtures';
 export type { GameState } from './game/GameState';
 export type { TrainData, TrainBranch } from './game/TrainData';
 export type { DominoValue } from './game/DominoValue';
+export {
+  generateSampleTrains,
+  type GenerateSampleTrainsOptions,
+} from './game/generateSampleTrains';
 
 // Rules core
 export {
