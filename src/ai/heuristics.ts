@@ -36,7 +36,7 @@ const preferPlay: Heuristic = {
   },
 };
 
-/** Offload weight: shed the heaviest tiles first to minimize end-of-round penalty. */
+/** Offload weight: shed the heaviest tiles first to minimize end-of-round points. */
 const dumpPips: Heuristic = {
   id: HEURISTIC_IDS.dumpPips,
   score(action) {
