@@ -33,7 +33,7 @@ export default defineConfig({
     copyPublicDir: false,
     lib: {
       entry: resolve(__dirname, 'src/index.ts'),
-      name: 'doubletwelve',
+      name: 'double-eighteen',
       formats: ['es', 'cjs'],
       fileName: (format) => (format === 'es' ? 'index.js' : 'index.cjs'),
     },

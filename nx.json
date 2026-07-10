@@ -46,7 +46,7 @@
       "dependsOn": ["^build"]
     }
   },
-  "defaultProject": "doubletwelve",
+  "defaultProject": "double-eighteen",
   "generators": {
     "@nx/react": {
       "application": {

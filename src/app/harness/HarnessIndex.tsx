@@ -6,12 +6,12 @@ const HARNESS_LINKS = [
   {
     to: '/harness/pips',
     title: 'Pip patterns',
-    description: 'Counts and grid positions for values 0–12, with optional colors.',
+    description: 'Counts and grid positions for values 0–18 (select double-9/12/15/18).',
   },
   {
     to: '/harness/dominoes',
     title: 'Domino tiles',
-    description: 'Doubles, mixed tiles, rotations, and colored pip rendering.',
+    description: 'Doubles, mixed tiles, rotations, and colored pip rendering per set size.',
   },
   {
     to: '/harness/trains',

@@ -1,11 +1,11 @@
-# doubletwelve
+# double-eighteen
 
-Double-12 Mexican Train dominoes for React — tile rendering, train layout (linear, offset, chicken foot), and a configurable rules engine.
+Double-9/12/15/18 Mexican Train dominoes for React — tile rendering, train layout (linear, offset, chicken foot), and a configurable rules engine.
 
 ## Install
 
 ```bash
-npm install doubletwelve
+npm install double-eighteen
 # peer dependency
 npm install react react-dom
 ```
@@ -13,10 +13,10 @@ npm install react react-dom
 ## Quick start
 
 ```tsx
-import { DoubleTwelve, MexicanTrainGame, DEFAULT_PIP_COLORS } from 'doubletwelve';
+import { DoubleEighteen, MexicanTrainGame, DEFAULT_PIP_COLORS } from 'double-eighteen';
 
 // Single tile
-<DoubleTwelve value1={6} value2={3} pipColors={DEFAULT_PIP_COLORS} />
+<DoubleEighteen value1={6} value2={3} pipColors={DEFAULT_PIP_COLORS} />
 
 // Full demo table (generates sample trains on mount)
 <MexicanTrainGame width={1200} height={800} />
@@ -26,7 +26,7 @@ import { DoubleTwelve, MexicanTrainGame, DEFAULT_PIP_COLORS } from 'doubletwelve
 
 | Layer | Exports |
 |-------|---------|
-| **Components** | `DoubleTwelve`, `DominoTrain`, `DominoHub`, `MexicanTrainGame` |
+| **Components** | `DoubleEighteen`, `DominoTrain`, `DominoHub`, `MexicanTrainGame` |
 | **Layout** | `computeTrainLayout`, `computeTrainTree`, overlap detection, bounds |
 | **Rules** | `playMove`, `getLegalMoves`, `resolveRules`, domino set helpers |
 | **Theming** | `DEFAULT_PIP_COLORS`, `mergePipColors`, pip layout grids |
@@ -43,16 +43,16 @@ import { DoubleTwelve, MexicanTrainGame, DEFAULT_PIP_COLORS } from 'doubletwelve
 ```bash
 yarn install
 yarn start          # demo app + visual harnesses at localhost:4200
-yarn test           # unit tests (176)
+yarn test           # unit tests
 yarn build:lib      # npm package → dist/
 yarn pack:dry-run   # preview the published tarball
 ```
 
-Harness routes (local demo): `/harness`, `/harness/trains`, `/harness/chicken-foot?layout=offset`
+Harness routes (local demo): `/`, `/harness`, `/harness/pips?set=18`, `/harness/dominoes`, `/harness/trains`, `/harness/chicken-foot?layout=offset`
 
 ## Publish to npm
 
-This package is configured to publish to the public registry at [npmjs.com](https://www.npmjs.com/package/doubletwelve).
+This package is configured to publish to the public registry at [npmjs.com](https://www.npmjs.com/package/double-eighteen).
 
 ```bash
 # one-time: log in (opens browser or prompts for OTP)

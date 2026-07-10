@@ -2,16 +2,24 @@ import { FC } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { PipPattern } from './PipPattern';
 import { DEFAULT_PIP_COLORS } from './pipColors';
+import { SetPicker } from './harness/SetPicker';
+import { parseSetParam } from '../harness/dominoFixtures';
 
 export const PipPatternHarness: FC = () => {
   const [searchParams] = useSearchParams();
   const colorEnabled = searchParams.get('color') === 'true';
+  const setSize = parseSetParam(searchParams.get('set'));
   const pipColors = colorEnabled ? DEFAULT_PIP_COLORS : undefined;
+
+  const colorLink = colorEnabled
+    ? `/harness/pips?set=${setSize}`
+    : `/harness/pips?set=${setSize}&color=true`;
 
   return (
     <div
       data-testid="pip-harness"
       data-colors-enabled={colorEnabled}
+      data-set={setSize}
       style={{ padding: 24, backgroundColor: '#f3f4f6' }}
     >
       <p style={{ marginBottom: 16 }}>
@@ -25,21 +33,17 @@ export const PipPatternHarness: FC = () => {
       </p>
       <h1>Pip Pattern Harness</h1>
       <p style={{ color: '#6b7280', marginBottom: 8 }}>
-        Reference grid for validating pip counts and positions (values 0–12).
+        Reference grid for validating pip counts and positions (values 0–{setSize}).
       </p>
+      <SetPicker
+        currentSet={setSize}
+        basePath="/harness/pips"
+        preserveParams={colorEnabled ? ['color'] : []}
+      />
       <p style={{ marginBottom: 24 }}>
-        {colorEnabled ? (
-          <Link to="/harness/pips" style={{ color: '#2563EB', fontSize: 14 }}>
-            Disable pip colors
-          </Link>
-        ) : (
-          <Link
-            to="/harness/pips?color=true"
-            style={{ color: '#2563EB', fontSize: 14 }}
-          >
-            Enable pip colors
-          </Link>
-        )}
+        <Link to={colorLink} style={{ color: '#2563EB', fontSize: 14 }}>
+          {colorEnabled ? 'Disable pip colors' : 'Enable pip colors'}
+        </Link>
       </p>
       <div
         style={{
@@ -48,7 +52,7 @@ export const PipPatternHarness: FC = () => {
           gap: 24,
         }}
       >
-        {Array.from({ length: 13 }, (_, value) => (
+        {Array.from({ length: setSize + 1 }, (_, value) => (
           <div
             key={value}
             data-testid={`pip-value-${value}`}

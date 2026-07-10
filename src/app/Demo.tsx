@@ -1,10 +1,16 @@
 import { FC, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { DoubleTwelve } from './DoubleTwelve';
+import { Link, useSearchParams } from 'react-router-dom';
+import { DominoTile } from './DominoSetPresets';
 import { MexicanTrainGame } from './MexicanTrainGame';
+import { SetPicker } from './harness/SetPicker';
 import { DEFAULT_PIP_COLORS, PipColorMap } from './pipColors';
+import { normalizeSetSize } from '@/variants';
 
 export const DominoDemo: FC = () => {
+  const [searchParams] = useSearchParams();
+  const setSize = normalizeSetSize(
+    Number(searchParams.get('set') ?? undefined)
+  );
   const [pipColors, setPipColors] = useState<PipColorMap | undefined>(
     undefined
   );
@@ -48,6 +54,8 @@ export const DominoDemo: FC = () => {
         </div>
       </div>
 
+      <SetPicker currentSet={setSize} basePath="/" />
+
       <div style={{ marginBottom: '32px' }}>
         <h2
           style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '16px' }}
@@ -66,6 +74,7 @@ export const DominoDemo: FC = () => {
           }}
         >
           <MexicanTrainGame
+            key={setSize}
             width={1200}
             height={1000}
             pipColors={pipColors}
@@ -73,14 +82,14 @@ export const DominoDemo: FC = () => {
             initialState={{
               playerCount: 8,
               trains: [],
-              engineValue: 12,
+              engineValue: setSize,
             }}
           />
         </div>
         <p style={{ marginTop: '8px', fontSize: '14px', color: '#6b7280' }}>
-          Use the controls in the top-left to switch layout styles. Toggle pip
-          colors to match a standard double-12 set. Red borders indicate public
-          trains that any player can play on.
+          Use the controls in the top-left to switch layout styles, regenerate
+          trains, and toggle chicken feet. Red borders indicate public trains.
+          Switch the set above to play with double-{setSize} tiles.
         </p>
       </div>
 
@@ -105,12 +114,13 @@ export const DominoDemo: FC = () => {
                 marginBottom: '16px',
               }}
             >
-              Double Dominoes (0-3)
+              Engine &amp; high doubles
             </h3>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px' }}>
-              <DoubleTwelve
-                value1={0}
-                value2={0}
+              <DominoTile
+                value1={setSize}
+                value2={setSize}
+                maxPips={setSize}
                 height={200}
                 width={100}
                 borderColor="black"
@@ -119,39 +129,62 @@ export const DominoDemo: FC = () => {
                 backgroundColor="white"
                 rotation={0}
               />
-              <DoubleTwelve
-                value1={1}
-                value2={1}
-                height={200}
-                width={100}
-                borderColor="black"
-                pipColor="black"
-                pipColors={pipColors}
-                backgroundColor="white"
-                rotation={0}
-              />
-              <DoubleTwelve
-                value1={2}
-                value2={2}
-                height={200}
-                width={100}
-                borderColor="black"
-                pipColor="black"
-                pipColors={pipColors}
-                backgroundColor="white"
-                rotation={0}
-              />
-              <DoubleTwelve
-                value1={3}
-                value2={3}
-                height={200}
-                width={100}
-                borderColor="black"
-                pipColor="black"
-                pipColors={pipColors}
-                backgroundColor="white"
-                rotation={0}
-              />
+              {setSize >= 15 && (
+                <>
+                  <DominoTile
+                    value1={15}
+                    value2={15}
+                    maxPips={setSize}
+                    height={200}
+                    width={100}
+                    borderColor="black"
+                    pipColor="black"
+                    pipColors={pipColors}
+                    backgroundColor="white"
+                    rotation={0}
+                  />
+                  <DominoTile
+                    value1={16}
+                    value2={16}
+                    maxPips={setSize}
+                    height={200}
+                    width={100}
+                    borderColor="black"
+                    pipColor="black"
+                    pipColors={pipColors}
+                    backgroundColor="white"
+                    rotation={0}
+                  />
+                </>
+              )}
+              {setSize >= 18 && (
+                <>
+                  <DominoTile
+                    value1={17}
+                    value2={17}
+                    maxPips={setSize}
+                    height={200}
+                    width={100}
+                    borderColor="black"
+                    pipColor="black"
+                    pipColors={pipColors}
+                    backgroundColor="white"
+                    rotation={0}
+                  />
+                  <DominoTile
+                    value1={18}
+                    value2={18}
+                    maxPips={setSize}
+                    height={200}
+                    width={100}
+                    borderColor="black"
+                    pipColor="black"
+                    pipColors={pipColors}
+                    backgroundColor="white"
+                    rotation={0}
+                  />
+                </>
+              )}
             </div>
           </div>
 
@@ -166,9 +199,10 @@ export const DominoDemo: FC = () => {
               Mixed Values
             </h3>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px' }}>
-              <DoubleTwelve
+              <DominoTile
                 value1={3}
-                value2={9}
+                value2={Math.min(9, setSize)}
+                maxPips={setSize}
                 height={200}
                 width={100}
                 borderColor="black"
@@ -177,9 +211,10 @@ export const DominoDemo: FC = () => {
                 backgroundColor="white"
                 rotation={0}
               />
-              <DoubleTwelve
+              <DominoTile
                 value1={6}
-                value2={7}
+                value2={Math.min(7, setSize)}
+                maxPips={setSize}
                 height={200}
                 width={100}
                 borderColor="black"
@@ -188,9 +223,10 @@ export const DominoDemo: FC = () => {
                 backgroundColor="white"
                 rotation={0}
               />
-              <DoubleTwelve
-                value1={12}
+              <DominoTile
+                value1={Math.min(12, setSize)}
                 value2={0}
+                maxPips={setSize}
                 height={200}
                 width={100}
                 borderColor="black"
@@ -199,6 +235,20 @@ export const DominoDemo: FC = () => {
                 backgroundColor="white"
                 rotation={0}
               />
+              {setSize >= 18 && (
+                <DominoTile
+                  value1={17}
+                  value2={18}
+                  maxPips={setSize}
+                  height={200}
+                  width={100}
+                  borderColor="black"
+                  pipColor="black"
+                  pipColors={pipColors}
+                  backgroundColor="white"
+                  rotation={0}
+                />
+              )}
             </div>
           </div>
 
@@ -220,9 +270,10 @@ export const DominoDemo: FC = () => {
                 alignItems: 'center',
               }}
             >
-              <DoubleTwelve
+              <DominoTile
                 value1={6}
                 value2={6}
+                maxPips={setSize}
                 rotation={0}
                 height={200}
                 width={100}
@@ -231,9 +282,10 @@ export const DominoDemo: FC = () => {
                 pipColors={pipColors}
                 backgroundColor="white"
               />
-              <DoubleTwelve
+              <DominoTile
                 value1={6}
                 value2={6}
+                maxPips={setSize}
                 rotation={90}
                 height={200}
                 width={100}

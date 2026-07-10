@@ -1,7 +1,7 @@
-import { test, expect } from '@playwright/test';
-import { CHICKEN_FOOT_FIXTURES } from '../../src/harness/trainFixtures';
+const { test, expect } = require('@playwright/test');
+const { CHICKEN_FOOT_FIXTURE_IDS } = require('./helpers.cjs');
 
-for (const layoutStyle of ['offset', 'linear'] as const) {
+for (const layoutStyle of ['offset', 'linear']) {
   test.describe(`chicken foot harness (${layoutStyle})`, () => {
     test.beforeEach(async ({ page }) => {
       await page.goto(`/harness/chicken-foot?layout=${layoutStyle}`);
@@ -11,17 +11,13 @@ for (const layoutStyle of ['offset', 'linear'] as const) {
       ).toHaveAttribute('data-layout-style', layoutStyle);
     });
 
-    const fixtures = CHICKEN_FOOT_FIXTURES.filter((fixture) =>
-      fixture.layoutStyles.includes(layoutStyle)
-    );
-
-    for (const fixture of fixtures) {
-      test(`fixture ${fixture.id} passes tree validation`, async ({ page }) => {
-        const section = page.getByTestId(`chicken-foot-fixture-${fixture.id}`);
+    for (const fixtureId of CHICKEN_FOOT_FIXTURE_IDS) {
+      test(`fixture ${fixtureId} passes tree validation`, async ({ page }) => {
+        const section = page.getByTestId(`chicken-foot-fixture-${fixtureId}`);
         await expect(section).toBeVisible();
         await expect(section).toHaveAttribute('data-valid', 'true');
         await expect(
-          page.getByTestId(`chicken-foot-status-${fixture.id}`)
+          page.getByTestId(`chicken-foot-status-${fixtureId}`)
         ).toContainText('passed');
       });
     }

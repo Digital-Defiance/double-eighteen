@@ -1,3 +1,6 @@
+import type { DominoSetSize } from '../variants';
+import { normalizeSetSize } from '../variants';
+
 export interface DominoFixture {
   id: string;
   label: string;
@@ -6,25 +9,38 @@ export interface DominoFixture {
   rotation?: number;
 }
 
-export const DOUBLE_FIXTURES: DominoFixture[] = Array.from(
-  { length: 13 },
-  (_, value) => ({
+export function doubleFixtures(maxPips: number): DominoFixture[] {
+  return Array.from({ length: maxPips + 1 }, (_, value) => ({
     id: `double-${value}`,
     label: `${value}|${value}`,
     value1: value,
     value2: value,
-  })
-);
+  }));
+}
 
-export const MIXED_FIXTURES: DominoFixture[] = [
-  { id: '12-0', label: '12|0', value1: 12, value2: 0 },
-  { id: '11-3', label: '11|3', value1: 11, value2: 3 },
-  { id: '10-5', label: '10|5', value1: 10, value2: 5 },
-  { id: '9-7', label: '9|7', value1: 9, value2: 7 },
-  { id: '8-2', label: '8|2', value1: 8, value2: 2 },
-  { id: '6-4', label: '6|4', value1: 6, value2: 4 },
-  { id: '5-1', label: '5|1', value1: 5, value2: 1 },
-];
+export const DOUBLE_FIXTURES = doubleFixtures(12);
+
+export function mixedFixtures(maxPips: number): DominoFixture[] {
+  const pairs: [number, number][] = [
+    [maxPips, 0],
+    [Math.max(0, maxPips - 1), 3],
+    [Math.max(0, maxPips - 2), 5],
+    [9, 7],
+    [8, 2],
+    [6, 4],
+    [5, 1],
+  ];
+  return pairs
+    .filter(([a, b]) => a <= maxPips && b <= maxPips)
+    .map(([value1, value2]) => ({
+      id: `${value1}-${value2}`,
+      label: `${value1}|${value2}`,
+      value1,
+      value2,
+    }));
+}
+
+export const MIXED_FIXTURES = mixedFixtures(12);
 
 export const ROTATION_FIXTURES: DominoFixture[] = [0, 90, 180, 270].map(
   (rotation) => ({
@@ -35,3 +51,8 @@ export const ROTATION_FIXTURES: DominoFixture[] = [0, 90, 180, 270].map(
     rotation,
   })
 );
+
+export function parseSetParam(raw: string | null): DominoSetSize {
+  const parsed = raw ? Number(raw) : NaN;
+  return normalizeSetSize(Number.isFinite(parsed) ? parsed : undefined);
+}

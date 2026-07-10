@@ -6981,9 +6981,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"doubletwelve@workspace:.":
+"double-eighteen@workspace:.":
   version: 0.0.0-use.local
-  resolution: "doubletwelve@workspace:."
+  resolution: "double-eighteen@workspace:."
   dependencies:
     "@eslint/js": "npm:^9.8.0"
     "@nx/devkit": "npm:21.6.11"

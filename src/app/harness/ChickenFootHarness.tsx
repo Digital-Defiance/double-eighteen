@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { DoubleTwelve } from '@/app/DoubleTwelve';
+import { DoubleTwelve } from '@/app/DominoSetPresets';
 import {
   DOMINO_HEIGHT,
   DOMINO_WIDTH,

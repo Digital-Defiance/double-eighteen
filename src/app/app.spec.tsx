@@ -41,4 +41,32 @@ describe('App', () => {
     );
     expect(screen.getByTestId('train-harness')).toBeTruthy();
   });
+
+  it('defaults the demo board to double-18', () => {
+    render(
+      <MemoryRouter initialEntries={['/']}>
+        <App />
+      </MemoryRouter>
+    );
+    expect(screen.getByText(/Engine: Double-18/)).toBeTruthy();
+  });
+
+  it('switches the demo board via the set picker', () => {
+    render(
+      <MemoryRouter initialEntries={['/?set=9']}>
+        <App />
+      </MemoryRouter>
+    );
+    expect(screen.getByText(/Engine: Double-9/)).toBeTruthy();
+    expect(screen.getByTestId('set-picker-9').getAttribute('href')).toBe('/?set=9');
+  });
+
+  it('loads double-15 from the URL query param', () => {
+    render(
+      <MemoryRouter initialEntries={['/?set=15']}>
+        <App />
+      </MemoryRouter>
+    );
+    expect(screen.getByText(/Engine: Double-15/)).toBeTruthy();
+  });
 });

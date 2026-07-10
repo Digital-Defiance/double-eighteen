@@ -1,7 +1,7 @@
 {
-  "name": "doubletwelve",
+  "name": "double-eighteen",
   "version": "0.3.2",
-  "description": "Double-12 Mexican Train dominoes — React components, layout engine, and rules core",
+  "description": "Mexican Train dominoes (Double 9/12/15/18)— React components, layout engine, and rules core",
   "license": "MIT",
   "author": "Digital Defiance, Jessica Mulein",
   "type": "module",
@@ -30,30 +30,42 @@
   "keywords": [
     "dominoes",
     "mexican-train",
+    "double-nine",
     "double-twelve",
+    "double-fifteen",
+    "double-eighteen",
+    "double-9",
     "double-12",
+    "double-15",
+    "double-18",
     "react",
     "game",
     "board-game",
-    "chicken-foot"
+    "chicken-foot",
+    "warp",
+    "warp-9",
+    "warp-12",
+    "warp-15",
+    "warp-18"
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/JessicaMulein/DoubleTwelve.git"
+    "url": "git+https://github.com/Digital-Defiance/double-eighteen.git"
   },
   "bugs": {
-    "url": "https://github.com/JessicaMulein/DoubleTwelve/issues"
+    "url": "https://github.com/Digital-Defiance/double-eighteen/issues"
   },
-  "homepage": "https://github.com/JessicaMulein/DoubleTwelve#readme",
+  "homepage": "https://github.com/Digital-Defiance/double-eighteen#readme",
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org/"
   },
   "scripts": {
-    "start": "nx serve doubletwelve",
-    "build": "nx build doubletwelve",
+    "start": "nx serve double-eighteen",
+    "build": "nx build double-eighteen",
     "build:lib": "vite build --config vite.lib.config.ts && rm -f dist/package.json",
     "test": "vitest run",
+    "test:e2e": "yarn nx run double-eighteen:build && yarn playwright test --config=e2e/playwright.config.cjs",
     "test:watch": "vitest",
     "typecheck": "tsc -p tsconfig.app.json --noEmit && tsc -p tsconfig.spec.json --noEmit",
     "ci": "yarn typecheck && yarn test && yarn build:lib && nx run-many -t lint test build",

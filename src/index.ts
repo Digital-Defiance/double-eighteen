@@ -1,6 +1,13 @@
 // Components
-export { DoubleTwelve } from './app/DoubleTwelve';
-export type { DoubleTwelveProps } from './app/DoubleTwelve';
+export { DominoTile } from './app/DominoTile';
+export type { DominoTileProps } from './app/DominoTile';
+export {
+  DoubleEighteen,
+  DoubleFifteen,
+  DoubleTwelve,
+  DoubleNine,
+} from './app/DominoSetPresets';
+export type { DoubleTwelveProps } from './app/DominoSetPresets';
 export { MexicanTrainGame } from './app/MexicanTrainGame';
 export { DominoHub, hubTrainStartDistance } from './app/DominoHub';
 export { DominoTrain } from './app/DominoTrain';
@@ -18,6 +25,16 @@ export type {
   TileRenderContext,
 } from './app/dominoTheme';
 
+// Variants
+export {
+  DOMINO_SETS,
+  clampPipValue,
+  normalizeSetSize,
+  resolveRulesForSet,
+  isDominoSetSize,
+} from './variants';
+export type { DominoSetSize } from './variants';
+
 // Pip color API
 export {
   DEFAULT_PIP_COLORS,
@@ -27,7 +44,12 @@ export {
   getPipStyle,
 } from './app/pipColors';
 export type { PipColorMap, PipColorStyle } from './app/pipColors';
-export { PIP_LAYOUTS, getPipLayout } from './app/pipLayouts';
+export {
+  PIP_LAYOUTS,
+  getPipLayout,
+  buildHighValueLayout,
+  HIGH_VALUE_LAYOUTS,
+} from './app/pipLayouts';
 export { resolvePipPosition } from './app/pipGrid';
 export type { PipGridSize, PipLayoutCell } from './app/pipGrid';
 

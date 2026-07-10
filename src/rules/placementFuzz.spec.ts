@@ -7,6 +7,7 @@ import {
   playMove,
 } from '@/rules/placement';
 import { resolveRules, RulesConfig } from '@/rules/rulesConfig';
+import { resolveRulesForSet } from '@/variants';
 
 /** Deterministic PRNG so fuzz failures are reproducible from the seed. */
 function mulberry32(seed: number): () => number {
@@ -90,6 +91,15 @@ describe('placement fuzz', () => {
         const seed = run * 997 + config.doubleObligation.length * 131;
         const handSize = 8 + (run % 10);
         playRandomGame(config, seed, handSize);
+      }
+    });
+  }
+
+  for (const setSize of [9, 12, 15, 18] as const) {
+    it(`plays random games for double-${setSize}`, () => {
+      const config = resolveRulesForSet(setSize);
+      for (let run = 0; run < 10; run++) {
+        playRandomGame(config, run * 503 + setSize, 6 + (run % 5));
       }
     });
   }

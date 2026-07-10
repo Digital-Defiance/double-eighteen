@@ -9,10 +9,10 @@ export interface GenerateSampleTrainsOptions {
   chickenFeet?: boolean;
 }
 
-/** Demo train generator that respects double-12 tile uniqueness constraints. */
+/** Demo train generator that respects tile-uniqueness constraints for the set. */
 export function generateSampleTrains(
   playerCount: number,
-  engineValue = 12,
+  engineValue = 18,
   options: GenerateSampleTrainsOptions = {}
 ): TrainData[] {
   const usedTiles = new Set<string>([tileKey(engineValue, engineValue)]);
@@ -47,7 +47,7 @@ export function generateSampleTrains(
     }
 
     const feet = options.chickenFeet
-      ? buildFeet(dominoes, usedTiles)
+      ? buildFeet(dominoes, usedTiles, engineValue)
       : undefined;
 
     trains.push({
@@ -67,7 +67,8 @@ export function generateSampleTrains(
  */
 function buildFeet(
   dominoes: readonly DominoValue[],
-  usedTiles: Set<string>
+  usedTiles: Set<string>,
+  maxPips: number
 ): Record<number, TrainBranch[]> | undefined {
   const feet: Record<number, TrainBranch[]> = {};
 
@@ -79,7 +80,7 @@ function buildFeet(
     const doubleValue = dominoes[i].value1;
     const toes: TrainBranch[] = [];
     for (let t = 0; t < 2; t++) {
-      const toe = buildToe(doubleValue, usedTiles);
+      const toe = buildToe(doubleValue, usedTiles, maxPips);
       if (toe) {
         toes.push(toe);
       }
@@ -95,14 +96,15 @@ function buildFeet(
 
 function buildToe(
   startValue: number,
-  usedTiles: Set<string>
+  usedTiles: Set<string>,
+  maxPips: number
 ): TrainBranch | null {
   const length = 1 + Math.floor(Math.random() * 2);
   const dominoes: DominoValue[] = [];
   let openValue = startValue;
 
   for (let j = 0; j < length; j++) {
-    const next = pickNonDouble(openValue, usedTiles);
+    const next = pickNonDouble(openValue, usedTiles, maxPips);
     if (next === null) {
       break;
     }
@@ -116,10 +118,11 @@ function buildToe(
 
 function pickNonDouble(
   openValue: number,
-  usedTiles: Set<string>
+  usedTiles: Set<string>,
+  maxPips: number
 ): number | null {
   const candidates: number[] = [];
-  for (let value = 0; value < 13; value++) {
+  for (let value = 0; value <= maxPips; value++) {
     if (value === openValue) {
       continue;
     }
@@ -143,7 +146,7 @@ function pickNextValue(
   engineValue: number,
   usedTiles: Set<string>
 ): number | null {
-  const candidates = Array.from({ length: 13 }, (_, value) => value).filter(
+  const candidates = Array.from({ length: engineValue + 1 }, (_, value) => value).filter(
     (value) =>
       isValidNextValue(
         openValue,

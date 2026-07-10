@@ -1,11 +1,13 @@
 import { render, screen, fireEvent } from '@testing-library/react';
+import { vi } from 'vitest';
+import * as sampleTrains from '@/game/generateSampleTrains';
 import { MexicanTrainGame } from './MexicanTrainGame';
 
 describe('MexicanTrainGame', () => {
   it('renders the control bar and engine/player readout', () => {
     render(<MexicanTrainGame />);
     expect(screen.getByText('New trains')).toBeTruthy();
-    expect(screen.getByText(/Engine: Double-12/)).toBeTruthy();
+    expect(screen.getByText(/Engine: Double-18/)).toBeTruthy();
     expect(screen.getByText(/Players: 8/)).toBeTruthy();
   });
 
@@ -41,5 +43,20 @@ describe('MexicanTrainGame', () => {
     );
     expect(screen.getByText(/Engine: Double-9/)).toBeTruthy();
     expect(screen.getByText(/Players: 4/)).toBeTruthy();
+  });
+
+  it('regenerates trains for the current engine value', () => {
+    const spy = vi
+      .spyOn(sampleTrains, 'generateSampleTrains')
+      .mockReturnValue([]);
+    render(
+      <MexicanTrainGame
+        initialState={{ playerCount: 4, trains: [], engineValue: 15 }}
+      />
+    );
+    spy.mockClear();
+    fireEvent.click(screen.getByText('New trains'));
+    expect(spy).toHaveBeenCalledWith(4, 15, expect.any(Object));
+    spy.mockRestore();
   });
 });

@@ -2,20 +2,26 @@ import { getPipLayout, PIP_LAYOUTS } from './pipLayouts';
 import { resolvePipPosition } from './pipGrid';
 
 describe('pipLayouts', () => {
-  it('defines layouts for values 0 through 12', () => {
-    for (let value = 0; value <= 12; value++) {
+  it('defines layouts for values 0 through 18', () => {
+    for (let value = 0; value <= 18; value++) {
       expect(PIP_LAYOUTS[value]).toBeDefined();
     }
   });
 
-  it.each([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])(
+  it.each([
+    ...Array.from({ length: 13 }, (_, i) => i),
+    13, 14, 15, 16, 17, 18,
+  ])(
     'value %i has %i pips',
     (value) => {
       expect(getPipLayout(value)).toHaveLength(value);
     }
   );
 
-  it.each([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])(
+  it.each([
+    ...Array.from({ length: 13 }, (_, i) => i),
+    13, 14, 15, 16, 17, 18,
+  ])(
     'value %i has unique grid positions',
     (value) => {
       const layout = getPipLayout(value);
@@ -27,16 +33,17 @@ describe('pipLayouts', () => {
     }
   );
 
-  it('value 10 uses a hollow box (4-2-4)', () => {
+  it('value 10 uses a portrait hollow box (3-2-3)', () => {
     const layout = getPipLayout(10);
     const topRow = layout.filter((cell) => cell.row === 0);
     const middleRow = layout.filter((cell) => cell.row === 1);
-    const bottomRow = layout.filter((cell) => cell.row === 2);
+    const bottomRow = layout.filter((cell) => cell.row === 3);
 
-    expect(topRow).toHaveLength(4);
+    expect(topRow).toHaveLength(3);
     expect(middleRow).toHaveLength(2);
-    expect(middleRow.map((cell) => cell.col).sort()).toEqual([0, 3]);
-    expect(bottomRow).toHaveLength(4);
+    expect(middleRow.map((cell) => cell.col).sort()).toEqual([0, 2]);
+    expect(bottomRow).toHaveLength(3);
+    expect(layout.every((cell) => cell.gridSize === '4x3')).toBe(true);
   });
 
   it('value 11 uses a framed rectangle with centered middle pip', () => {
@@ -51,13 +58,25 @@ describe('pipLayouts', () => {
     expect(middleCol.some((cell) => cell.top === '50%')).toBe(true);
   });
 
+  it('value 12 fills 4 rows of 3 columns on the 4x3 grid', () => {
+    const layout = getPipLayout(12);
+    expect(layout).toHaveLength(12);
+    expect(layout.every((cell) => cell.gridSize === '4x3')).toBe(true);
+    for (let col = 0; col < 3; col++) {
+      expect(layout.filter((cell) => cell.col === col)).toHaveLength(4);
+    }
+  });
+
   it('value 8 fills a 3x3 square with center missing', () => {
     const layout = getPipLayout(8);
     expect(layout.every((cell) => cell.gridSize === '3x3')).toBe(true);
     expect(layout.some((cell) => cell.row === 1 && cell.col === 1)).toBe(false);
   });
 
-  it.each([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])(
+  it.each([
+    ...Array.from({ length: 13 }, (_, i) => i),
+    13, 14, 15, 16, 17, 18,
+  ])(
     'value %i resolves pip positions',
     (value) => {
       for (const cell of getPipLayout(value)) {
