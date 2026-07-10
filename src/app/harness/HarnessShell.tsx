@@ -7,6 +7,7 @@ interface HarnessShellProps {
   description: string;
   children: ReactNode;
   controls?: ReactNode;
+  dataSet?: number;
 }
 
 export const HarnessShell: FC<HarnessShellProps> = ({
@@ -15,10 +16,12 @@ export const HarnessShell: FC<HarnessShellProps> = ({
   description,
   children,
   controls,
+  dataSet,
 }) => {
   return (
     <div
       data-testid={testId}
+      {...(dataSet !== undefined ? { 'data-set': dataSet } : {})}
       style={{ padding: 24, backgroundColor: '#f3f4f6', minHeight: '100vh' }}
     >
       <p style={{ marginBottom: 16 }}>

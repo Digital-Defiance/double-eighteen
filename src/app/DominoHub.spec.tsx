@@ -11,7 +11,7 @@ const baseProps = {
   tableHeight: 1000,
 };
 
-// DoubleTwelve tile roots are the only elements carrying transform-origin.
+// Domino tile roots are the only elements carrying transform-origin.
 const TILE = '[style*="transform-origin"]';
 
 describe('DominoHub', () => {
@@ -19,9 +19,42 @@ describe('DominoHub', () => {
     const { container } = render(
       <DominoHub {...baseProps} playerCount={4} engineValue={12} trains={[]} />
     );
-    // Engine is a double-12: 24 pips on the single engine tile.
     expect(container.querySelectorAll('[data-testid="pip"]').length).toBe(24);
     expect(container.querySelectorAll(TILE).length).toBe(1);
+  });
+
+  it('renders a double-18 engine with 36 pips when maxPips is 18', () => {
+    const { container } = render(
+      <DominoHub
+        {...baseProps}
+        playerCount={4}
+        engineValue={18}
+        maxPips={18}
+        trains={[]}
+      />
+    );
+    expect(container.querySelectorAll('[data-testid="pip"]').length).toBe(36);
+  });
+
+  it('clamps train tile values to maxPips', () => {
+    const trains: TrainData[] = [
+      {
+        playerId: 0,
+        isPublic: false,
+        dominoes: [{ value1: 18, value2: 17 }],
+      },
+    ];
+    const { container } = render(
+      <DominoHub
+        {...baseProps}
+        playerCount={2}
+        engineValue={18}
+        maxPips={18}
+        trains={trains}
+      />
+    );
+    // engine (36) + 17|18 tile (35) = 71 pips
+    expect(container.querySelectorAll('[data-testid="pip"]').length).toBe(71);
   });
 
   it('always lays out at least eight train slots', () => {

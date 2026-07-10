@@ -1,10 +1,12 @@
 import { FC, CSSProperties } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { DoubleTwelve } from '@/app/DoubleTwelve';
+import { DominoTile } from '@/app/DominoTile';
 import { DEFAULT_PIP_COLORS } from '@/app/pipColors';
+import { SetPicker } from '@/app/harness/SetPicker';
 import {
-  DOUBLE_FIXTURES,
-  MIXED_FIXTURES,
+  doubleFixtures,
+  mixedFixtures,
+  parseSetParam,
   ROTATION_FIXTURES,
 } from '@/harness/dominoFixtures';
 import { HarnessShell } from './HarnessShell';
@@ -23,30 +25,34 @@ const tileStyle: CSSProperties = {
 export const DominoHarness: FC = () => {
   const [searchParams] = useSearchParams();
   const colorEnabled = searchParams.get('color') === 'true';
+  const setSize = parseSetParam(searchParams.get('set'));
   const pipColors = colorEnabled ? DEFAULT_PIP_COLORS : undefined;
+
+  const colorLink = colorEnabled
+    ? `/harness/dominoes?set=${setSize}`
+    : `/harness/dominoes?set=${setSize}&color=true`;
 
   return (
     <HarnessShell
       testId="domino-harness"
       title="Domino Tile Harness"
       description="Reference tiles for doubles, mixed values, and rotations."
+      dataSet={setSize}
       controls={
-        colorEnabled ? (
-          <Link to="/harness/dominoes" style={{ color: '#2563EB', fontSize: 14 }}>
-            Disable pip colors
+        <>
+          <SetPicker
+            currentSet={setSize}
+            basePath="/harness/dominoes"
+            preserveParams={colorEnabled ? ['color'] : []}
+          />
+          <Link to={colorLink} style={{ color: '#2563EB', fontSize: 14 }}>
+            {colorEnabled ? 'Disable pip colors' : 'Enable pip colors'}
           </Link>
-        ) : (
-          <Link
-            to="/harness/dominoes?color=true"
-            style={{ color: '#2563EB', fontSize: 14 }}
-          >
-            Enable pip colors
-          </Link>
-        )
+        </>
       }
     >
       <section style={{ marginBottom: 32 }}>
-        <h2 style={{ marginBottom: 16 }}>Doubles 0–12</h2>
+        <h2 style={{ marginBottom: 16 }}>Doubles 0–{setSize}</h2>
         <div
           style={{
             display: 'grid',
@@ -54,7 +60,7 @@ export const DominoHarness: FC = () => {
             gap: 16,
           }}
         >
-          {DOUBLE_FIXTURES.map((fixture) => (
+          {doubleFixtures(setSize).map((fixture) => (
             <div
               key={fixture.id}
               data-testid={fixture.id}
@@ -63,9 +69,10 @@ export const DominoHarness: FC = () => {
               style={tileStyle}
             >
               <span style={{ fontWeight: 600 }}>{fixture.label}</span>
-              <DoubleTwelve
+              <DominoTile
                 value1={fixture.value1}
                 value2={fixture.value2}
+                maxPips={setSize}
                 width={60}
                 height={120}
                 pipColor="black"
@@ -85,7 +92,7 @@ export const DominoHarness: FC = () => {
             gap: 16,
           }}
         >
-          {MIXED_FIXTURES.map((fixture) => (
+          {mixedFixtures(setSize).map((fixture) => (
             <div
               key={fixture.id}
               data-testid={fixture.id}
@@ -94,9 +101,10 @@ export const DominoHarness: FC = () => {
               style={tileStyle}
             >
               <span style={{ fontWeight: 600 }}>{fixture.label}</span>
-              <DoubleTwelve
+              <DominoTile
                 value1={fixture.value1}
                 value2={fixture.value2}
+                maxPips={setSize}
                 width={60}
                 height={120}
                 pipColor="black"
@@ -124,9 +132,10 @@ export const DominoHarness: FC = () => {
               style={tileStyle}
             >
               <span style={{ fontWeight: 600 }}>{fixture.label}</span>
-              <DoubleTwelve
+              <DominoTile
                 value1={fixture.value1}
                 value2={fixture.value2}
+                maxPips={setSize}
                 width={60}
                 height={120}
                 rotation={fixture.rotation}

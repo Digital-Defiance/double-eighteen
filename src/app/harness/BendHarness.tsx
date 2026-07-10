@@ -1,6 +1,6 @@
 import { FC, useCallback, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { DoubleTwelve } from '@/app/DoubleTwelve';
+import { DoubleTwelve } from '@/app/DominoSetPresets';
 import { Viewport } from '@/app/Viewport';
 import {
   DOMINO_HEIGHT,

@@ -5,12 +5,16 @@ import { DominoHalf } from './DominoHalf';
 import type { DominoTheme, TileRenderContext } from './dominoTheme';
 import { themeDataAttributes } from './dominoTheme';
 import { PipColorMap } from './pipColors';
+import { clampPipValue } from '../variants';
+import type { DominoSetSize } from '../variants';
 
-export interface DoubleTwelveProps {
-  /** Pip count on the top half (0–12). Defaults to 0 (blank). */
+export interface DominoTileProps {
+  /** Pip count on the top half. Defaults to 0 (blank). */
   value1?: number;
-  /** Pip count on the bottom half (0–12). Defaults to 0 (blank). */
+  /** Pip count on the bottom half. Defaults to 0 (blank). */
   value2?: number;
+  /** Highest pip value in the set (9, 12, 15, or 18). Defaults to 18. */
+  maxPips?: DominoSetSize | number;
   width?: number;
   height?: number;
   backgroundColor?: string;
@@ -24,9 +28,10 @@ export interface DoubleTwelveProps {
   theme?: DominoTheme;
 }
 
-export const DoubleTwelve: FC<DoubleTwelveProps> = ({
+export const DominoTile: FC<DominoTileProps> = ({
   value1 = 0,
   value2 = 0,
+  maxPips = 18,
   width = 100,
   height = 200,
   backgroundColor = 'white',
@@ -37,8 +42,8 @@ export const DoubleTwelve: FC<DoubleTwelveProps> = ({
   theme: themeOverride,
 }) => {
   const theme = useDominoTheme(themeOverride);
-  const val1 = Math.min(Math.max(value1, 0), 12);
-  const val2 = Math.min(Math.max(value2, 0), 12);
+  const val1 = clampPipValue(value1, maxPips);
+  const val2 = clampPipValue(value2, maxPips);
 
   const tileCtx: TileRenderContext = {
     value1: val1,
@@ -98,4 +103,4 @@ export const DoubleTwelve: FC<DoubleTwelveProps> = ({
   );
 };
 
-export default DoubleTwelve;
+export default DominoTile;

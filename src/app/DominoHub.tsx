@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { DominoTrain } from '@/app/DominoTrain';
-import { DoubleTwelve } from '@/app/DoubleTwelve';
+import { DominoTile } from '@/app/DominoTile';
 import { TrainData } from '@/game/TrainData';
 import { PipColorMap } from '@/app/pipColors';
 
@@ -15,6 +15,8 @@ interface DominoHubProps {
   tableWidth: number;
   tableHeight: number;
   pipColors?: PipColorMap;
+  /** Highest pip value in the set (defaults to engineValue). */
+  maxPips?: number;
 }
 
 /**
@@ -45,7 +47,9 @@ export const DominoHub: FC<DominoHubProps> = ({
   tableWidth,
   tableHeight,
   pipColors,
+  maxPips: maxPipsProp,
 }) => {
+  const maxPips = maxPipsProp ?? engineValue;
   // Ensure we have at least 8 player slots
   const slots = Math.max(8, playerCount);
   const hubSize = 120; // Increased to fit the standard domino size
@@ -78,9 +82,10 @@ export const DominoHub: FC<DominoHubProps> = ({
       >
         {/* Engine domino in the center */}
         <div style={{ transform: 'rotate(0deg)' }}>
-          <DoubleTwelve
+          <DominoTile
             value1={engineValue}
             value2={engineValue}
+            maxPips={maxPips}
             width={dominoWidth}
             height={dominoHeight}
             backgroundColor="white"
@@ -120,6 +125,7 @@ export const DominoHub: FC<DominoHubProps> = ({
             centerX={centerX}
             centerY={centerY}
             pipColors={pipColors}
+            maxPips={maxPips}
           />
         );
       })}

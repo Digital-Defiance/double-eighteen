@@ -17,10 +17,23 @@ const baseProps = {
 const renderTrain = (trainData: TrainData) =>
   render(<DominoTrain {...baseProps} trainData={trainData} />);
 
-// DoubleTwelve tile roots are the only elements carrying transform-origin.
+// Domino tile roots are the only elements carrying transform-origin.
 const TILE = '[style*="transform-origin"]';
 
 describe('DominoTrain', () => {
+  it('renders high-value tiles when maxPips is 18', () => {
+    const trainData: TrainData = {
+      playerId: 0,
+      isPublic: false,
+      dominoes: [{ value1: 18, value2: 17 }],
+    };
+    const { container } = render(
+      <DominoTrain {...baseProps} trainData={trainData} maxPips={18} />
+    );
+    expect(container.querySelectorAll('[data-testid="pip"]').length).toBe(35);
+    expect(container.querySelectorAll(TILE).length).toBe(1);
+  });
+
   it('renders one tile per domino in the run', () => {
     const trainData: TrainData = {
       playerId: 0,

@@ -22,7 +22,7 @@ export interface ChickenFootConfig {
  * to get a fully-populated config; unspecified fields fall back to DEFAULT_RULES.
  */
 export interface RulesConfig {
-  /** Highest pip value in the set (12 → double-12, 91 tiles). */
+  /** Highest pip value in the set (12 → double-12, 18 → double-18, 91 / 190 tiles). */
   maxPips: number;
   /** Value of the starting engine double (defaults to maxPips). */
   engineValue: number;
@@ -38,8 +38,8 @@ export interface RulesConfig {
 }
 
 export const DEFAULT_RULES: RulesConfig = {
-  maxPips: 12,
-  engineValue: 12,
+  maxPips: 18,
+  engineValue: 18,
   allowConsecutiveDoubles: false,
   requireUniqueTiles: true,
   requireSequential: true,

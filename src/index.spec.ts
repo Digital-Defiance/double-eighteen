@@ -4,11 +4,21 @@ describe('public API surface', () => {
   it('exports every advertised value binding (no broken barrel re-exports)', () => {
     const expected = [
       // components
+      'DominoTile',
+      'DoubleEighteen',
+      'DoubleFifteen',
       'DoubleTwelve',
+      'DoubleNine',
       'MexicanTrainGame',
       'DominoHub',
       'hubTrainStartDistance',
       'DominoTrain',
+      // variants
+      'DOMINO_SETS',
+      'clampPipValue',
+      'normalizeSetSize',
+      'resolveRulesForSet',
+      'isDominoSetSize',
       // pip color API
       'DEFAULT_PIP_COLORS',
       'PIP_COLORS',
@@ -17,6 +27,8 @@ describe('public API surface', () => {
       'getPipStyle',
       'PIP_LAYOUTS',
       'getPipLayout',
+      'buildHighValueLayout',
+      'HIGH_VALUE_LAYOUTS',
       'resolvePipPosition',
       // layout
       'computeTrainLayout',

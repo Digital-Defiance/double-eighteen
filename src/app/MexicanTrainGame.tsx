@@ -15,7 +15,7 @@ interface MexicanTrainGameProps {
 const defaultGameState: GameState = {
   playerCount: 8,
   trains: [],
-  engineValue: 12,
+  engineValue: 18,
 };
 
 export const MexicanTrainGame: FC<MexicanTrainGameProps> = ({
@@ -163,6 +163,7 @@ export const MexicanTrainGame: FC<MexicanTrainGameProps> = ({
         tableWidth={width}
         tableHeight={height}
         pipColors={pipColors}
+        maxPips={gameState.engineValue}
       />
     </div>
   );

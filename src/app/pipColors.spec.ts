@@ -63,9 +63,15 @@ describe('pipColors: deprecated aliases', () => {
 });
 
 describe('pipColors: default set', () => {
-  it('defines a style for every value 0..12', () => {
-    for (let value = 0; value <= 12; value++) {
+  it('defines a style for every value 0..18', () => {
+    for (let value = 0; value <= 18; value++) {
       expect(DEFAULT_PIP_COLORS[value]).toBeDefined();
+    }
+  });
+
+  it('defines distinct styles for high-value pips 13..18', () => {
+    for (const value of [13, 14, 15, 16, 17, 18]) {
+      expect(resolvePipStyle(value, {})).toEqual(DEFAULT_PIP_COLORS[value]);
     }
   });
 

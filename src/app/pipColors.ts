@@ -3,10 +3,10 @@ export interface PipColorStyle {
   hollow?: boolean;
 }
 
-/** Partial map of domino values (0–12) to pip styles. */
+/** Partial map of domino values (0–18) to pip styles. */
 export type PipColorMap = Partial<Record<number, PipColorStyle>>;
 
-/** Standard double-12 domino pip colors by value. */
+/** Standard double-18 domino pip colors by value. */
 export const DEFAULT_PIP_COLORS: PipColorMap = {
   0: { color: 'transparent' },
   1: { color: '#1a1a1a' },
@@ -21,12 +21,18 @@ export const DEFAULT_PIP_COLORS: PipColorMap = {
   10: { color: '#EA580C' },
   11: { color: '#166534' },
   12: { color: '#DC2626' },
+  13: { color: '#F472B6' },
+  14: { color: '#64748B' },
+  15: { color: '#7C3AED' },
+  16: { color: '#F59E0B' },
+  17: { color: '#78350F' },
+  18: { color: '#14532D' },
 };
 
 /** @deprecated Use DEFAULT_PIP_COLORS instead. */
 export const PIP_COLORS = DEFAULT_PIP_COLORS;
 
-/** Merge custom overrides onto the default double-12 color set. */
+/** Merge custom overrides onto the default double-18 color set. */
 export function mergePipColors(overrides?: PipColorMap): PipColorMap {
   return { ...DEFAULT_PIP_COLORS, ...overrides };
 }

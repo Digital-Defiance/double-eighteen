@@ -13,14 +13,27 @@ describe('dominoSet', () => {
     expect(dominoSetSize(6)).toBe(28);
     expect(dominoSetSize(9)).toBe(55);
     expect(dominoSetSize(12)).toBe(91);
+    expect(dominoSetSize(15)).toBe(136);
+    expect(dominoSetSize(18)).toBe(190);
   });
 
-  it('generates a full unique double-12 set', () => {
-    const set = generateDominoSet(12);
-    expect(set).toHaveLength(91);
+  it.each([9, 12, 15, 18])(
+    'generates a full unique double-%i set',
+    (maxPips) => {
+      const set = generateDominoSet(maxPips);
+      expect(set).toHaveLength(dominoSetSize(maxPips));
+      const keys = new Set(set.map(dominoKey));
+      expect(keys.size).toBe(set.length);
+      expect(set.filter(isDouble)).toHaveLength(maxPips + 1);
+    }
+  );
+
+  it('includes high-value tiles in a double-18 set', () => {
+    const set = generateDominoSet(18);
     const keys = new Set(set.map(dominoKey));
-    expect(keys.size).toBe(91);
-    expect(set.filter(isDouble)).toHaveLength(13);
+    expect(keys.has('17:18')).toBe(true);
+    expect(keys.has('15:15')).toBe(true);
+    expect(keys.has('18:18')).toBe(true);
   });
 
   it('keys tiles order-independently', () => {

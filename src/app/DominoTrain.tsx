@@ -1,5 +1,5 @@
 import { FC, useEffect, useMemo } from 'react';
-import { DoubleTwelve } from '@/app/DoubleTwelve';
+import { DominoTile } from '@/app/DominoTile';
 import {
   DOMINO_HEIGHT,
   DOMINO_WIDTH,
@@ -30,6 +30,7 @@ interface DominoTrainProps {
   centerX: number;
   centerY: number;
   pipColors?: PipColorMap;
+  maxPips?: number;
 }
 
 export const DominoTrain: FC<DominoTrainProps> = ({
@@ -43,6 +44,7 @@ export const DominoTrain: FC<DominoTrainProps> = ({
   centerX,
   centerY,
   pipColors,
+  maxPips = 18,
 }) => {
   // Guard rail: a train must be a sequentially-correct chain (like-values
   // touching, toes connecting to their double). Rather than silently drawing a
@@ -100,9 +102,10 @@ export const DominoTrain: FC<DominoTrainProps> = ({
               zIndex: 5,
             }}
           >
-            <DoubleTwelve
+            <DominoTile
               value1={entry.value1}
               value2={entry.value2}
+              maxPips={maxPips}
               width={DOMINO_WIDTH}
               height={DOMINO_HEIGHT}
               backgroundColor="white"
