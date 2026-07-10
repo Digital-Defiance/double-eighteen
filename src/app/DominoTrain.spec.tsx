@@ -17,8 +17,7 @@ const baseProps = {
 const renderTrain = (trainData: TrainData) =>
   render(<DominoTrain {...baseProps} trainData={trainData} />);
 
-// Domino tile roots are the only elements carrying transform-origin.
-const TILE = '[style*="transform-origin"]';
+const TILE = '[data-testid="domino-tile"]';
 
 describe('DominoTrain', () => {
   it('renders high-value tiles when maxPips is 18', () => {

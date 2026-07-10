@@ -11,8 +11,7 @@ const baseProps = {
   tableHeight: 1000,
 };
 
-// Domino tile roots are the only elements carrying transform-origin.
-const TILE = '[style*="transform-origin"]';
+const TILE = '[data-testid="domino-tile"]';
 
 describe('DominoHub', () => {
   it('renders the engine double in the center even with no trains', () => {
