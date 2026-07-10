@@ -60,6 +60,7 @@ export const DominoTile: FC<DominoTileProps> = ({
 
   return (
     <div
+      data-testid="domino-tile"
       className={theme.tileClassName}
       {...themeDataAttributes(theme.tileDataAttributes)}
       style={{
@@ -89,7 +90,12 @@ export const DominoTile: FC<DominoTileProps> = ({
           ...dividerThemed,
         }}
       >
-        <DominoHalf value={val1} pipColor={pipColor} pipColors={pipColors} />
+        <DominoHalf
+          half={1}
+          value={val1}
+          pipColor={pipColor}
+          pipColors={pipColors}
+        />
       </div>
       <div
         style={{
@@ -97,7 +103,13 @@ export const DominoTile: FC<DominoTileProps> = ({
           position: 'relative',
         }}
       >
-        <DominoHalf value={val2} pipColor={pipColor} pipColors={pipColors} />
+        <DominoHalf
+          half={2}
+          value={val2}
+          pipColor={pipColor}
+          pipColors={pipColors}
+          rotated
+        />
       </div>
     </div>
   );

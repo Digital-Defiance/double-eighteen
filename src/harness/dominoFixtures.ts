@@ -52,6 +52,29 @@ export const ROTATION_FIXTURES: DominoFixture[] = [0, 90, 180, 270].map(
   })
 );
 
+/**
+ * Asymmetric faces (13–15) make the required 180° second-half rotation visible:
+ * remainder pips sit on one side of the body only. Symmetric faces (0–12, 16–18)
+ * look identical with or without the half rotation.
+ */
+export function halfOrientationFixtures(maxPips: number): DominoFixture[] {
+  const asymmetric = [13, 14, 15].filter((value) => value <= maxPips);
+  return asymmetric.flatMap((value) => [
+    {
+      id: `half-orient-double-${value}`,
+      label: `${value}|${value} (half 180°)`,
+      value1: value,
+      value2: value,
+    },
+    {
+      id: `half-orient-mixed-${value}`,
+      label: `${value}|0 (half 180°)`,
+      value1: value,
+      value2: 0,
+    },
+  ]);
+}
+
 export function parseSetParam(raw: string | null): DominoSetSize {
   const parsed = raw ? Number(raw) : NaN;
   return normalizeSetSize(Number.isFinite(parsed) ? parsed : undefined);

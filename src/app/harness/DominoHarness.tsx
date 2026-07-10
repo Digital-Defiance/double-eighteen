@@ -5,6 +5,7 @@ import { DEFAULT_PIP_COLORS } from '@/app/pipColors';
 import { SetPicker } from '@/app/harness/SetPicker';
 import {
   doubleFixtures,
+  halfOrientationFixtures,
   mixedFixtures,
   parseSetParam,
   ROTATION_FIXTURES,
@@ -31,12 +32,13 @@ export const DominoHarness: FC = () => {
   const colorLink = colorEnabled
     ? `/harness/dominoes?set=${setSize}`
     : `/harness/dominoes?set=${setSize}&color=true`;
+  const halfFixtures = halfOrientationFixtures(setSize);
 
   return (
     <HarnessShell
       testId="domino-harness"
       title="Domino Tile Harness"
-      description="Reference tiles for doubles, mixed values, and rotations."
+      description="Reference tiles for doubles, mixed values, half orientation, and rotations."
       dataSet={setSize}
       controls={
         <>
@@ -114,6 +116,47 @@ export const DominoHarness: FC = () => {
           ))}
         </div>
       </section>
+
+      {halfFixtures.length > 0 && (
+        <section style={{ marginBottom: 32 }}>
+          <h2 style={{ marginBottom: 16 }}>
+            Half orientation (asymmetric 13–15)
+          </h2>
+          <p style={{ marginBottom: 16, color: '#4b5563', fontSize: 14 }}>
+            The second half is rotated 180°. On these faces the remainder row
+            should sit at both outer ends of a double, not both near the
+            divider.
+          </p>
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))',
+              gap: 16,
+            }}
+          >
+            {halfFixtures.map((fixture) => (
+              <div
+                key={fixture.id}
+                data-testid={fixture.id}
+                data-value1={fixture.value1}
+                data-value2={fixture.value2}
+                style={tileStyle}
+              >
+                <span style={{ fontWeight: 600 }}>{fixture.label}</span>
+                <DominoTile
+                  value1={fixture.value1}
+                  value2={fixture.value2}
+                  maxPips={setSize}
+                  width={60}
+                  height={120}
+                  pipColor="black"
+                  pipColors={pipColors}
+                />
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       <section>
         <h2 style={{ marginBottom: 16 }}>Rotations (6|9)</h2>
