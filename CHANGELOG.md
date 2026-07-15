@@ -4,6 +4,16 @@ All notable changes to `double-eighteen` are documented here. This project adher
 to [Semantic Versioning](https://semver.org/) and the format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.4.3] - 2026-07-14
+
+### Changed
+
+- Docs: README now credits the production consumer **[Warp 12](https://warp12.app)**.
+
+## [0.4.2] - 2026-07-14
+
+- Maintenance republish (no functional changes).
+
 ## [0.4.1] - 2026-07-14
 
 ### Added

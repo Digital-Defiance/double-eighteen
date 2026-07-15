@@ -13,6 +13,8 @@ Headless engine for **Mexican Train / multi-trail dominoes** across the double-9
 > **[`double-eighteen-react`](https://www.npmjs.com/package/double-eighteen-react)**,
 > which renders everything this package computes. **▶ [Live demo](https://digital-defiance.github.io/double-eighteen-react/)**
 
+**In production:** `double-eighteen` powers the rules, AI, and board geometry behind **[Warp 12](https://warp12.app)** — federation-themed multi-trail dominoes for web, desktop (Tauri), and mobile.
+
 ## Why
 
 Most domino packages on npm are just tile artwork. `double-eighteen` is the part that's actually hard:
