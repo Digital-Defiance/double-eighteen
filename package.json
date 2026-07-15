@@ -1,7 +1,7 @@
 {
   "name": "double-eighteen",
-  "version": "0.3.3",
-  "description": "Mexican Train dominoes (Double 9/12/15/18)— React components, layout engine, and rules core",
+  "version": "0.4.1",
+  "description": "Mexican Train dominoes (Double 9/12/15/18) — headless rules, AI, and layout/geometry core. React components live in double-eighteen-react.",
   "license": "MIT",
   "author": "Digital Defiance, Jessica Mulein",
   "type": "module",
@@ -25,6 +25,7 @@
   "files": [
     "dist",
     "README.md",
+    "CHANGELOG.md",
     "LICENSE"
   ],
   "keywords": [
@@ -72,10 +73,6 @@
     "prepublishOnly": "yarn test && yarn build:lib",
     "prepack": "yarn build:lib",
     "pack:dry-run": "npm pack --dry-run"
-  },
-  "peerDependencies": {
-    "react": ">=18.0.0",
-    "react-dom": ">=18.0.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.8.0",

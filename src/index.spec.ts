@@ -3,16 +3,8 @@ import * as lib from './index';
 describe('public API surface', () => {
   it('exports every advertised value binding (no broken barrel re-exports)', () => {
     const expected = [
-      // components
-      'DominoTile',
-      'DoubleEighteen',
-      'DoubleFifteen',
-      'DoubleTwelve',
-      'DoubleNine',
-      'MexicanTrainGame',
-      'DominoHub',
+      // hub layout geometry (pure)
       'hubTrainStartDistance',
-      'DominoTrain',
       // variants
       'DOMINO_SETS',
       'clampPipValue',
@@ -54,8 +46,7 @@ describe('public API surface', () => {
       'withBendAt',
       'resolveBend',
       'cycleBendAt',
-      // viewport
-      'Viewport',
+      // viewport math
       'clampScale',
       'zoomAt',
       'fitToBounds',
@@ -66,6 +57,13 @@ describe('public API surface', () => {
       'validateChickenFootChain',
       'TRAIN_FIXTURES',
       'CHICKEN_FOOT_FIXTURES',
+      'parseSetParam',
+      'doubleFixtures',
+      'DOUBLE_FIXTURES',
+      'mixedFixtures',
+      'MIXED_FIXTURES',
+      'halfOrientationFixtures',
+      'ROTATION_FIXTURES',
       // rules core
       'tileKey',
       'dominoKey',

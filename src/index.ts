@@ -1,19 +1,8 @@
-// Components
-export { DominoTile } from './app/DominoTile';
-export type { DominoTileProps } from './app/DominoTile';
-export {
-  DoubleEighteen,
-  DoubleFifteen,
-  DoubleTwelve,
-  DoubleNine,
-} from './app/DominoSetPresets';
-export type { DoubleTwelveProps } from './app/DominoSetPresets';
-export { MexicanTrainGame } from './app/MexicanTrainGame';
-export { DominoHub, hubTrainStartDistance } from './app/DominoHub';
-export { DominoTrain } from './app/DominoTrain';
-export { DominoThemeProvider, useDominoTheme } from './app/DominoThemeContext';
-export type { DominoThemeProviderProps } from './app/DominoThemeContext';
-export { DefaultPip } from './app/DefaultPip';
+// double-eighteen — headless core.
+// Rules, AI, layout/geometry math, theming data, and types. NO React.
+// React components live in the companion package `double-eighteen-react`.
+
+// Theme data + types (React types are imported type-only, so this stays headless)
 export {
   DEFAULT_DOMINO_THEME,
   mergeDominoTheme,
@@ -53,7 +42,10 @@ export {
 export { resolvePipPosition } from './app/pipGrid';
 export type { PipGridSize, PipLayoutCell } from './app/pipGrid';
 
+// Train layout geometry
 export {
+  DOMINO_WIDTH,
+  DOMINO_HEIGHT,
   computeTrainLayout,
   computeTrainTree,
   flattenSegments,
@@ -97,9 +89,10 @@ export type {
   ResolveBendResult,
 } from './app/trainBends';
 
-// Pan/zoom viewport
-export { Viewport } from './app/Viewport';
-export type { ViewportProps } from './app/Viewport';
+// Hub layout geometry (pure — the React `DominoHub` lives in double-eighteen-react)
+export { hubTrainStartDistance } from './app/hubLayout';
+
+// Pan/zoom viewport math
 export {
   clampScale,
   zoomAt,
@@ -111,6 +104,8 @@ export type {
   Size as ViewportSize,
   Point as ViewportPoint,
 } from './app/viewportMath';
+
+// Layout validation + fixtures
 export {
   validateTrainLayout,
   validateTrainTree,
@@ -213,3 +208,15 @@ export {
   createPolicyPlayer,
   searchActionValues,
 } from './ai';
+
+// Harness fixtures + parser (used by dev/visual harnesses in double-eighteen-react)
+export {
+  parseSetParam,
+  doubleFixtures,
+  DOUBLE_FIXTURES,
+  mixedFixtures,
+  MIXED_FIXTURES,
+  halfOrientationFixtures,
+  ROTATION_FIXTURES,
+} from './harness/dominoFixtures';
+export type { DominoFixture } from './harness/dominoFixtures';
