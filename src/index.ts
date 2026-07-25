@@ -50,6 +50,7 @@ export {
   computeTrainTree,
   flattenSegments,
   stepAlongTrain,
+  halfExtentAlongTrain,
   outwardPerpSign,
   getTrainLayoutBounds,
   tileCorners,
@@ -68,6 +69,19 @@ export type {
   ComputeTrainLayoutInput,
   ComputeTrainTreeInput,
 } from './app/trainLayout';
+
+// Classic line / spinner cross layout
+export {
+  computeLineLayout,
+  LINE_END_ANGLES,
+} from './app/lineLayout';
+export type {
+  LineEndId,
+  LineArmData,
+  LineArmPlacement,
+  LineLayoutResult,
+  ComputeLineLayoutInput,
+} from './app/lineLayout';
 
 // Branch bending / pivoting
 export {
