@@ -121,7 +121,7 @@
     "typescript-eslint": "^8.19.0",
     "vite": "7.3.6",
     "vite-plugin-dts": "^4.5.4",
-    "vitest": "^3"
+    "vitest": "^4"
   },
   "resolutions": {
     "ws": "8.21.0",
